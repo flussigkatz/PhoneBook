@@ -1,55 +1,42 @@
+import java.util.Arrays;
 import java.util.Scanner;
 
 public class PhoneBook {
 
     public static void main(String[] args) {
         Scanner scanner = new Scanner(System.in);
-        boolean stop = false;
         String name = "";
         String number = "";
         String[][] book = {{"Иванов Иван Иванович", "+7 999 999 99 99"}, {"Михайлов Михаил Михайлович", "+7 888 888 88 88"}};
-        while (!name.equals("stop")) {
-            name = scanner.nextLine();
-            if (!checkName(name)) {
-                System.out.println("Введите корректное имя!");
-            } else if (searchBook(name, book) != "") {
-                System.out.println(searchBook(name, book));
-            } else {
+        System.out.println("Введите stop для завершения.\nВведите list для печати книги.");
+        while (!name.equals("Stop")) {
+            System.out.println("Введите имя:");
+            name = formatName(scanner.nextLine());
+            if (name.equals("Stop")) {
+                break;
+            }
+            else if (name.equals("List")) {
+                list(book);
+            }
+            else if (!checkName(name)) System.out.println("Введите корректное имя!");
+            else if (searchBook(name, book) != ("")) System.out.println(searchBook(name, book));
+            else {
+                System.out.println("Введите телефон:");
                 number = formatPhoneNumber(scanner.nextLine());
-                add(book, name, number);
+                book = add(book, name, number);
             }
         }
-    }
-    private static String searchBook(String name, String[][] book) {
-        String res = "";
-        for (String[] namecolumn : book) {
-            for (int z = 0; z < namecolumn.length; z++) {
-                if (namecolumn[z].equals(name)) {
-                    System.out.println(z);
-                    res = name + ": " + book[z][1];
-                }
-            }
-        } return res;
     }
 
-    /*private static String scaningBook(String name, String[][] book) {
+    private static String searchBook(String name, String[][] book) {
         String res = "";
-        String[] copyarray = Arrays.copyOf(book, book.length);
-        String[] copyarray = book;
-        for (int x = 0; x < book.length -1; x++) {
-            if (name.equalsIgnoreCase(book[x][0])) {
-                res = book[x][1];
-                break;
+        for (int z = 0; z < book.length; z++) {
+            if (book[z][0].equals(name)) {
+                res = name + ": " + book[z][1];
             }
-        for (String x : copyarray) {
-            if (x.equalsIgnoreCase(name)) {
-                res = x;
-                break;
-            }
-            System.out.println(x);
         }
         return res;
-    }*/
+    }
 
     public static boolean checkPhoneNumber(String phoneNumber) {
         String clean = phoneNumber.replaceAll("[^0-9]", "");
@@ -57,41 +44,44 @@ public class PhoneBook {
     }
 
     public static boolean checkName(String name) {
-            String[] words = name.trim().split(" ");
-            return words.length == 3;
+        String[] words = name.trim().split(" ");
+        return words.length == 3;
     }
 
     public static String formatName(String name) {
+        String res = "";
         String[] words = name.trim().split(" ");
-        String result = "";
-        for (int i = 0; i < words.length; i++) {
-            String str = words[i];
-            char firstChar = str.charAt(0);
-            if (!Character.isUpperCase(firstChar)) {
-                result += Character.toUpperCase(firstChar) + str.substring(1) + " ";
-            } else {
-                result += str + " ";
-            }
+        for (int x = 0; x < words.length; x++) {
+            words[x] = words[x].replace(words[x].charAt(0), Character.toUpperCase(words[x].charAt(0)));
         }
-        return result;
+        for (String c : words) {
+            res += c + " ";
+        }
+        return res.trim();
     }
 
     public static String formatPhoneNumber(String number) {
-        String clean = number.replaceAll("[^0-9]", "");
-        String result = "+7" + " " + clean.substring(1, 4) + " " +
-                clean.substring(4, 7) + " " + clean.substring(7, 9) + " " + clean.substring(9);
-
-        return result;
+        String cleanNumber = number.replaceAll("[^0-9]", "");
+        String res = "+7" + " " + cleanNumber.substring(1, 4) + " " + cleanNumber.substring(4, 7) + " " + cleanNumber.substring(7, 9) + " " + cleanNumber.substring(9);
+        return res;
     }
 
-    public static void add(String[][] book, String name, String number) {
-        String[][] bookbigger = new String[book.length + 1][2];
-        bookbigger[book.length][0] = name;
-        bookbigger[book.length][1] = number;
-        System.out.println(bookbigger[book.length][0] + " " + bookbigger[book.length][1]);
+    public static String[][] add(String[][] book, String name, String number) {
+        String[][] bigbook = new String[book.length + 1][2];
+        for (int x = 0; x < book.length; x++) {
+            bigbook[x] = Arrays.copyOf(book[x], book.length);
+        }
+        bigbook[book.length][0] = name;
+        bigbook[book.length][1] = number;
+        book = new String[bigbook.length][2];
+        for (int x = 0; x < bigbook.length; x++) {
+            book[x] = Arrays.copyOf(bigbook[x], bigbook.length);
+        } return book;
     }
 
     public static void list(String[][] book) {
-        //print phone book
+        for (int x = 0; x < book.length; x++) {
+            System.out.println(book[x][0] + ": " + book[x][1]);
+        }
     }
 }
